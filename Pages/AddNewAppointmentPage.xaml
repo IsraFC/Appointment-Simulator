@@ -13,7 +13,7 @@
             <Entry Text="{Binding Subject}" Placeholder="Ingresa el asunto"/>
 
             <Label Text="Fecha de la cita" FontAttributes="Bold" />
-            <DatePicker Date="{Binding AppointmentDate}" />
+            <DatePicker Date="{Binding AppointmentDateTime}" />
 
             <Label Text="Hora de inicio" FontAttributes="Bold" />
             <TimePicker Time="{Binding StartingTime}" />

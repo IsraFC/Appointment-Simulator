@@ -24,6 +24,13 @@ namespace AppointmentSimulator.ViewModels
         [ObservableProperty]
         private TimeSpan _endingTime = new(10, 0, 0);
 
+        public DateTime AppointmentDateTime
+        {
+            get => _appointmentDate.ToDateTime(TimeOnly.MinValue);
+            set => AppointmentDate = DateOnly.FromDateTime(value);
+        }
+
+
         // Agregar cita
         [RelayCommand]
         private async Task AddAppointment()
@@ -31,6 +38,13 @@ namespace AppointmentSimulator.ViewModels
             if (string.IsNullOrWhiteSpace(Name) || string.IsNullOrWhiteSpace(Subject))
             {
                 await Shell.Current.DisplayAlert("Error", "Debes llenar todos los campos.", "Ok");
+                return;
+            }
+
+            // Validar fecha
+            if (AppointmentDate < DateOnly.FromDateTime(DateTime.Today))
+            {
+                await Shell.Current.DisplayAlert("Error", "La fecha de la cita no puede ser anterior a hoy.", "Ok");
                 return;
             }
 
@@ -49,13 +63,6 @@ namespace AppointmentSimulator.ViewModels
                 return;
             }
 
-            // Validar fecha
-            if (AppointmentDate < DateOnly.FromDateTime(DateTime.Today))
-            {
-                await Shell.Current.DisplayAlert("Error", "La fecha de la cita no puede ser anterior a hoy.", "Ok");
-                return;
-            }
-
             Appointment appointment = new()
             {
                 Name = Name.Trim(),
@@ -70,5 +77,23 @@ namespace AppointmentSimulator.ViewModels
             await Shell.Current.DisplayAlert("Éxito", "La cita fue registrada correctamente.", "Ok");
             await Shell.Current.GoToAsync("..");
         }
+
+        // Eliminar cita
+        [RelayCommand]
+        private async Task DeleteAppointment(Appointment appointment)
+        {
+            if (appointment == null) return;
+
+            bool confirm = await Shell.Current.DisplayAlert(
+                "Confirmar",
+                $"¿Deseas eliminar la cita de {appointment.Name}?",
+                "Sí", "No");
+
+            if (confirm)
+            {
+                GlobalData.Appointments.Remove(appointment);
+            }
+        }
+
     }
 }
